@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <list>
+#include <map>
+#include <vector>
+#include <producto.h>
 using namespace std;
 
 bool administrador_inicio();
@@ -79,7 +82,40 @@ bool administrador_inicio()
 }
 void ver_inventario()
 {
+    /*
+    La funcion para mostrar el inventario abre el archivo data.txt donde estaran los datos
+    de los productos, la cantidad que hay y el precio de cada uno; se recorre el archivo linea por linea
+    y luego espacio por espacio, se almacena cada string entre espacio dentro de un vector para
+    despues proceder a crear un elemento de la clase producto y así mostrar cada producto de una
+    manera mas ordenada.
+    */
     fstream archivo("data.txt");
-    archivo << "hola";
+    string linea;
+    int contador=0;
+    vector<string> producto_creacion;
+    cout<<"Producto    Cantidad    Precio"<<endl;
+    while(getline(archivo,linea))
+    {
+        istringstream isstream(linea);
+        while(!isstream.eof())
+        {
+           string temp , aux;
+           isstream >> temp;
+           producto_creacion.push_back(temp);
+        }
+        int prize,cost;
+        string aux;
+        aux=producto_creacion[2];
+        //prize=atoi(aux);
+
+
+
+        contador++;
+    }
+
+    if(contador==0)
+    {
+        cout<<"el inventario esta vacio"<<endl;
+    }
     archivo.close();
 }
