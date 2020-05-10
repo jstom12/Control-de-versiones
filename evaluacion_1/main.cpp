@@ -10,9 +10,11 @@
 #include <map>
 #include <vector>
 #include <producto.h>
+
 using namespace std;
 
 bool administrador_inicio();
+void anadir_clave();
 void ver_inventario();
 void modificar_inventario();
 void reporte_diario();
@@ -61,24 +63,37 @@ int main()
 bool administrador_inicio()
 {
     /*
-    La clave como administrador es predeterminada y para cambiarla basta con
-    modificar la variable clave pero por facilidad se deja una clave estandar.
-
-    el usuario al ingresar la clave, si esta coincide retorna un true, de lo contrario
-    un false.
-    clave: hola24
+    Para verificar la clave, se abre el archivo de texto donde esta contenida la clave de administrador
+    (de no existir, se crea el archivo y se le pide al usuario agregar una nueva clave de administrador)
+    y verifica si la clave que ingresa el usuario es igual a la clave registrada en el archivo, de ser iguales
+    se retorna un true y de lo contrario retorna un false.
     */
-    string clave, aux;
-    clave="hola24";
-    cout<<"Ingrese la clave de administrador predeterminada"<<endl;
-    getline(cin,aux);
-    getline(cin,aux);
-    if(clave==aux)
-    {
-        return true;
+    string clave, linea;
+    fstream archivo;
+    archivo.open("sudo.txt");
+    if(!archivo.is_open())//al no abrirse el archivo, se entiende que es que no existe y se
+    {                     // procede a agregar una nueva clave de administrador.
+       anadir_clave();
     }
-    else
-        return false;
+    archivo.open("sudo.txt");
+    cout<<"Ingrese la clave de administrador: "<<endl;
+    getline(cin,clave);
+    getline(cin,clave);
+    while(getline(archivo,linea))
+    {
+        if(linea==clave)
+        {
+            archivo.close();
+            return true;
+        }
+        else
+        {
+            archivo.close();
+            return false;
+        }
+    }
+    archivo.close();
+    return false;
 }
 void ver_inventario()
 {
@@ -93,7 +108,8 @@ void ver_inventario()
     string linea;
     int contador=0;
     vector<string> producto_creacion;
-    cout<<"Producto    Cantidad    Precio"<<endl;
+    vector<producto>inventary;
+    cout<<"Producto     Cantidad     Precio"<<endl;
     while(getline(archivo,linea))
     {
         istringstream isstream(linea);
@@ -103,19 +119,52 @@ void ver_inventario()
            isstream >> temp;
            producto_creacion.push_back(temp);
         }
-        int prize,cost;
+        int prize,cant;
         string aux;
         aux=producto_creacion[2];
-        //prize=atoi(aux);
-
-
-
+        int tamano=aux.size();
+        char conversion[tamano];
+        for(int i=0;i<tamano;i++)
+        {
+            conversion[i]=aux[i];
+        }
+        prize=atoi(conversion);
+        aux=producto_creacion[1];
+        tamano=aux.size();
+        char conversion_2[tamano];
+        for(int i=0;i<tamano;i++)
+        {
+            conversion_2[i]=aux[i];
+        }
+        cant=atoi(conversion_2);
+        producto producto_aux(producto_creacion[0],cant,prize);
+        inventary.push_back(producto_aux);
         contador++;
     }
 
     if(contador==0)
     {
-        cout<<"el inventario esta vacio"<<endl;
+        cout<<"---el inventario esta vacio---"<<endl;
+    }
+    vector<producto>::iterator it;
+    it=inventary.begin();
+    for(it;it<inventary.end();it++)
+    {
+        cout<<it->getNombre()<<"     "<<it->getCantidad()<<"     "<<it->getPrecio()<<endl;
     }
     archivo.close();
+}
+void anadir_clave()
+{
+    string clave;
+    ofstream temp;
+    temp.open("sudo.txt");
+    cout<<"No hay clave de administrador actualmente, por favor ingrese la nueva clave de administrador"<<endl;
+    getline(cin,clave);
+    getline(cin,clave);
+    temp << clave;
+    cout<<"Procesando..."<<endl;
+    cout<<"Nueva clave creada."<<endl;
+    temp.close();
+
 }
