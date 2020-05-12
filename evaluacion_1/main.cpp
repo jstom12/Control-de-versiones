@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 #include <producto.h>
+#include <conio.h>
 
 using namespace std;
 
@@ -20,9 +21,11 @@ void modificar_inventario();
 void agregar_producto();
 void eliminar_producto();
 void reporte_diario();
+vector<producto> obtener_productos_disponibles();
 
 int main()
 {
+    obtener_productos_disponibles();
     cout<<"-----¡Bienvenido!-----"<<endl;
     cout<<"---Ingrese una opcion---"<<endl;
     cout<<"1) Ingresar como administrador.\n2) Ingresar como usuario.\n"<<endl;
@@ -34,7 +37,7 @@ int main()
         if(administrador_inicio()==true)
         {
             cout<<endl;
-            cout<<"opcion:\n1)Ver inventario.\n2)Modificar inventario.\n3)Ver reporte del dia"<<endl;
+            cout<<"opcion:\n1)Ver inventario.\n2)Modificar inventario.\n3)Crear combos.\n4)Ver reporte del dia."<<endl;
             int opcion_administrador;
             cin>>opcion_administrador;
             switch (opcion_administrador) {
@@ -49,6 +52,11 @@ int main()
             }
                 break;
             case 3:
+            {
+
+            }
+                break;
+            case 4:
             {
 
             }
@@ -68,6 +76,7 @@ int main()
         getline(cin,usuario);
         getline(cin,usuario);
         cout<<"¡Hola "<<usuario<<"!\n ¿Que deseas realizar?"<<endl;
+
     }
     default:
         break;
@@ -199,25 +208,29 @@ void eliminar_producto()
         }
         else if(pos!=-1)
         {
-            int tamano=producto.size() , j=0 , limite;
-            char aux[tamano];
-            limite=pos+producto.size();
-            for(int i=pos;i<limite;i++)
+            int limite=0;
+            istringstream isstream(linea);
+            while(!isstream.eof())
             {
-                linea[i]=aux[j];
-                j++;
-            }
-            for(int i=0;i<tamano;i++)
-            {
-                aux_comparacion[i]=aux[i];
-            }
-            if(aux_comparacion!=producto)
-            {
-                temp << linea << endl;
-            }
 
+               string temp__;
+
+               isstream >> temp__;
+               if(limite==0)
+               {
+                   if(producto!=temp__)
+                   {
+                       temp << linea << endl;
+                       limite++;
+                   }
+               }
+               else if(limite!=0)
+               {
+                   break;
+               }
+               limite++;
+            }
         }
-
     }
     archivo.close();
     temp.close();
@@ -233,7 +246,8 @@ void agregar_producto()
     ofstream archivo("data.txt",ios::app|ios::ate);
     string producto;
     int proceso=1;
-    while(proceso==1){
+    while(proceso==1)
+    {
         cout<<"Ingrese el nombre del nuevo producto:"<<endl;
         getline(cin,producto);
         getline(cin,producto);
@@ -244,10 +258,63 @@ void agregar_producto()
         cout<<"Ingrese el costo que tiene el producto"<<endl;
         getline(cin,producto);
         archivo << producto << endl;
-        cout<<"¿Desea continuar agregando elementos?"<<endl;
+        cout<<"¿Desea continuar agregando elementos?(1/si 0/no"<<endl;
         cin>>proceso;
     }
     archivo.close();
+}
+vector<producto> obtener_productos_disponibles()
+{
+    int contador=0;
+    ifstream archivo("data.txt");
+    string linea,aux_temp;
+    producto producto_temporal;
+    vector<producto>products;
+    vector<string>auxiliar;
+    while(getline(archivo,linea))
+    {
+        istringstream isstream(linea);
+        while(!isstream.eof())
+        {
+            contador++;
+           isstream >> aux_temp;
+           auxiliar.push_back(aux_temp);
+           if(contador==1)
+           {
+               string auxliar=auxiliar[0];
+               producto_temporal.setNombre(auxliar);
+           }
+           else if(contador==2)
+           {
+               string auxliar=auxiliar[1];
+               int size_1=auxliar.size();
+               char aux_convertir[size_1];
+               for(int i=0;i<size_1;i++)
+               {
+                   aux_convertir[i]=aux_temp[i];
+               }
+               int number = atoi(aux_convertir);
+               producto_temporal.setCantidad(number);
+           }
+           else if(contador==3)
+           {
+               string auxliar=auxiliar[2];
+               int size_1=auxliar.size();
+               char aux_convertir[size_1];
+               for(int i=0;i<size_1;i++)
+               {
+                   aux_convertir[i]=aux_temp[i];
+               }
+               int number = atoi(aux_convertir);
+               producto_temporal.setPrecio(number);
+           }
+           products.push_back(producto_temporal);
+        }
+        auxiliar.clear();
+        contador=0;
+    }
+    archivo.close();
+    return products;
 }
 
 

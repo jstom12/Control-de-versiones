@@ -1,13 +1,13 @@
 #include "producto.h"
 
-int producto::getPrecio() const
+string producto::getNombre() const
 {
-    return precio;
+    return nombre;
 }
 
-void producto::setPrecio(int value)
+void producto::setNombre(const string &value)
 {
-    precio = value;
+    nombre = value;
 }
 
 int producto::getCantidad() const
@@ -20,14 +20,14 @@ void producto::setCantidad(int value)
     cantidad = value;
 }
 
-string producto::getNombre() const
+double producto::getPrecio() const
 {
-    return nombre;
+    return precio;
 }
 
-void producto::setNombre(const string &value)
+void producto::setPrecio(double value)
 {
-    nombre = value;
+    precio = value;
 }
 
 producto::producto()
@@ -35,7 +35,7 @@ producto::producto()
 
 }
 
-producto::producto(string, int, int)
+producto::producto(string, int, double)
 {
 
 }

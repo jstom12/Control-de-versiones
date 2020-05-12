@@ -9,20 +9,22 @@ class producto
 {
     string nombre;
     int cantidad;
-    int precio;
+    double precio;
+
 
 public:
     producto();
-    producto(string, int , int);
+    producto(string, int, double);
 
     //map<string, int> getProducto_cantidad() const;
     //void setProducto_cantidad(const map<string, int> &value);
-    int getPrecio() const;
-    void setPrecio(int value);
-    int getCantidad() const;
-    void setCantidad(int value);
+
     string getNombre() const;
     void setNombre(const string &value);
+    int getCantidad() const;
+    void setCantidad(int value);
+    double getPrecio() const;
+    void setPrecio(double value);
 };
 
 #endif // PRODUCTO_H
