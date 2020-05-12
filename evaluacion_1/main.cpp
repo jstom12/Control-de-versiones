@@ -22,6 +22,8 @@ void agregar_producto();
 void eliminar_producto();
 void reporte_diario();
 vector<producto> obtener_productos_disponibles();
+void combos(vector<producto> );
+
 
 int main()
 {
@@ -37,7 +39,7 @@ int main()
         if(administrador_inicio()==true)
         {
             cout<<endl;
-            cout<<"opcion:\n1)Ver inventario.\n2)Modificar inventario.\n3)Crear combos.\n4)Ver reporte del dia."<<endl;
+            cout<<"opcion:\n1)Ver inventario.\n2)Modificar inventario.\n3)Crear combos.\n4)modificar un producto en el inventario.\n5)Ver reporte del dia.."<<endl;
             int opcion_administrador;
             cin>>opcion_administrador;
             switch (opcion_administrador) {
@@ -124,6 +126,8 @@ void ver_inventario()
     La funcion para mostrar el inventario abre el archivo data.txt donde estaran los datos
     de los productos, la cantidad que hay y el precio de cada uno; se recorre el archivo linea por linea
     y se va imprimiendo conforme avance el ciclo, esto para que las impresiones se distingan facilmente.
+
+    De no tener datos el archivo, se imprime un mensaje que avisa que el inventario esta vacio.
     */
     fstream archivo("data.txt");
     string linea;
@@ -169,6 +173,10 @@ void anadir_clave()
 }
 void modificar_inventario()
 {
+    /*
+    En esta funcion solo se muestra el menu donde estan las opciones para modificar el inventario;
+    elegida una opcion se procede entonces a invocar la funcion que realiza tal accion.
+    */
     int opcion;
     cout<<"1) Agregar para agregar producto.\n2) Eliminar un producto"<<endl;
     cin>>opcion;
@@ -185,7 +193,7 @@ void eliminar_producto()
 {
     /*
     Para eliminar un producto del inventario, procedemos a abrir el archivo donde se almacenan los datos
-    en modo lectura y creamos un nuevo archivo en modo escritorio donde procederemos a escribir todos
+    en modo lectura y creamos un nuevo archivo en modo escritura donde procederemos a escribir todos
     los productos que se almacenan en el archivos de los datos a excepcion del producto que se busca eliminar.
     al finalizar eliminamos el archivo de datos antiguo y renombramos el archivo de escritura para dejarlo
     como el nuevo archivo de datos.
@@ -241,7 +249,12 @@ void eliminar_producto()
 void agregar_producto()
 {
     /*
-
+        Para agregar un producto a la base de datos, lo que hacemos es abrir el archivo en modo
+        escritura con las funciones ios::app|ios::ate que sirven para empezar la escritura al
+        final del archivo, procedemos a pedirle al usuario el nombre del producto, la cantidad
+        de este que hay y el valor de este; mientras se va obteniendo la informacion se va escribiendo en
+        el archivo, por lo tanto al pedir el ultimo dato el archivo se cierra y el producto queda agregado
+        a la base de datos.
     */
     ofstream archivo("data.txt",ios::app|ios::ate);
     string producto;
@@ -278,15 +291,15 @@ vector<producto> obtener_productos_disponibles()
         {
             contador++;
            isstream >> aux_temp;
-           auxiliar.push_back(aux_temp);
+           //auxiliar.push_back(aux_temp);
            if(contador==1)
            {
-               string auxliar=auxiliar[0];
+               string auxliar=aux_temp;
                producto_temporal.setNombre(auxliar);
            }
            else if(contador==2)
            {
-               string auxliar=auxiliar[1];
+               string auxliar=aux_temp;
                int size_1=auxliar.size();
                char aux_convertir[size_1];
                for(int i=0;i<size_1;i++)
@@ -298,7 +311,7 @@ vector<producto> obtener_productos_disponibles()
            }
            else if(contador==3)
            {
-               string auxliar=auxiliar[2];
+               string auxliar=aux_temp;
                int size_1=auxliar.size();
                char aux_convertir[size_1];
                for(int i=0;i<size_1;i++)
@@ -307,16 +320,77 @@ vector<producto> obtener_productos_disponibles()
                }
                int number = atoi(aux_convertir);
                producto_temporal.setPrecio(number);
-           }
-           products.push_back(producto_temporal);
+           }      
         }
+        products.push_back(producto_temporal);
         auxiliar.clear();
         contador=0;
     }
     archivo.close();
     return products;
 }
+void combos(vector<producto> productos)
+{
+    fstream archivo;
+    archivo.open("dataCombos.txt");
+    cout<<"1)Crear combo.\n2)Eliminar combo."<<endl;
+    int choose;
+    cin>>choose;
+    if(choose==1)
+    {
+        string linea;
+        int contador=1;
+        while(getline(archivo,linea))
+        {
+            istringstream isstream(linea);
+            while(!isstream.eof() && contador==1)
+            {
 
+            }
+        }
+        cout<<"Productos disponibles: "<<endl;
+        vector<producto>::iterator it;
+        it=productos.begin();
+        while(it!=productos.end())
+        {
+            if(it->getCantidad()>0)cout<<it->getNombre()<<endl;
+
+        }
+        int opcion=1;
+        while(opcion==1)
+        {
+        cout<<"ingrese el primer producto y la cantidad que quiere en el combo: (ejemplo: gaseosa 1)"<<endl;
+        string producto_1;
+        getline(cin,producto_1);
+        archivo << producto_1 <<" ";
+        cout<<"Ingrese el segundo producto y la cantidad que quiere en el combo: (ejemplo: papas 2"<<endl;
+        getline(cin,producto_1);
+        archivo << producto_1<<endl;
+        cout<<endl;
+        cout<<"Combo creado."<<endl;
+        cout<<"¿Desea seguir creando combos?(1/si 0/no)"<<endl;
+        cin>>opcion;
+        }
+
+    }
+    else if(choose==2)
+    {
+        string linea;
+        while(getline(archivo,linea))
+        {
+            istringstream isstream(linea);
+            while(!isstream.eof())
+            {
+
+            }
+        }
+    }
+    else
+    {
+        cout<<"saliendo..."<<endl;
+    }
+    archivo.close();
+}
 
 
 
