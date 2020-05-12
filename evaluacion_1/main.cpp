@@ -23,6 +23,7 @@ void eliminar_producto();
 void reporte_diario();
 vector<producto> obtener_productos_disponibles();
 void combos(vector<producto> );
+vector<string> separar_string(string );
 
 
 int main()
@@ -135,7 +136,15 @@ void ver_inventario()
     cout<<"Producto   Cantidad   Precio"<<endl;
     while(getline(archivo,linea))
     {
-        istringstream isstream(linea);
+        vector<string> linea_actual;
+        linea_actual=separar_string(linea);
+        for(int i=0;i<3;i++)
+        {
+            cout<<linea_actual[i]<<"    ";
+        }
+        cout<<endl;
+        contador++;
+        /*istringstream isstream(linea);
         while(!isstream.eof())
         {
            string temp , aux;
@@ -144,7 +153,7 @@ void ver_inventario()
 
         }
         cout<<endl;
-        contador++;
+        contador++;*/
     }
 
     if(contador==0)
@@ -216,8 +225,18 @@ void eliminar_producto()
         }
         else if(pos!=-1)
         {
-            int limite=0;
-            istringstream isstream(linea);
+            //int limite=0;
+            vector<string> linea_actual;
+            linea_actual=separar_string(linea);
+            for(int i=0;i<linea_actual.size();i++)
+            {
+                if(producto==linea_actual[i])
+                {
+                    break;
+                }
+            }
+
+            /*istringstream isstream(linea);
             while(!isstream.eof())
             {
 
@@ -237,7 +256,7 @@ void eliminar_producto()
                    break;
                }
                limite++;
-            }
+            }*/
         }
     }
     archivo.close();
@@ -264,13 +283,13 @@ void agregar_producto()
         cout<<"Ingrese el nombre del nuevo producto:"<<endl;
         getline(cin,producto);
         getline(cin,producto);
-        archivo << producto <<" ";
+        archivo << producto <<";";
         cout<<"Ingrese la cantidad de unidades del producto"<<endl;
         getline(cin,producto);
-        archivo << producto <<" ";
+        archivo << producto <<";";
         cout<<"Ingrese el costo que tiene el producto"<<endl;
         getline(cin,producto);
-        archivo << producto << endl;
+        archivo << producto << ";" << endl;
         cout<<"¿Desea continuar agregando elementos?(1/si 0/no"<<endl;
         cin>>proceso;
     }
@@ -278,15 +297,42 @@ void agregar_producto()
 }
 vector<producto> obtener_productos_disponibles()
 {
-    int contador=0;
+    //int contador=0;
     ifstream archivo("data.txt");
     string linea,aux_temp;
     producto producto_temporal;
     vector<producto>products;
-    vector<string>auxiliar;
+    vector<string> linea_actual;
+    //vector<string>auxiliar;
     while(getline(archivo,linea))
     {
-        istringstream isstream(linea);
+
+        linea_actual=separar_string(linea);
+        producto_temporal.setNombre(linea_actual[0]);
+        string auxliar=aux_temp;
+        int size_1=linea_actual[1].size();
+        char aux_convertir[size_1];
+        for(int i=0;i<size_1;i++)
+        {
+            aux_convertir[i]=linea_actual[1][i];
+        }
+        int number = atoi(aux_convertir);
+        producto_temporal.setCantidad(number);
+        size_1=linea_actual[2].size();
+        char aux_convertir2[size_1];
+        for(int i=0;i<size_1;i++)
+        {
+            aux_convertir2[i]=linea_actual[2][i];
+        }
+        number = atoi(aux_convertir2);
+        producto_temporal.setPrecio(number);
+        if(producto_temporal.getCantidad()>0)
+        {
+           products.push_back(producto_temporal);
+        }
+        linea_actual.clear();
+        //contador=0;
+        /*stringstream isstream(linea);
         while(!isstream.eof())
         {
             contador++;
@@ -321,10 +367,7 @@ vector<producto> obtener_productos_disponibles()
                int number = atoi(aux_convertir);
                producto_temporal.setPrecio(number);
            }      
-        }
-        products.push_back(producto_temporal);
-        auxiliar.clear();
-        contador=0;
+        }*/
     }
     archivo.close();
     return products;
@@ -391,7 +434,17 @@ void combos(vector<producto> productos)
     }
     archivo.close();
 }
-
+vector<string> separar_string(string linea)
+{
+    vector<string> string_separate;
+    stringstream strTemp(linea);
+    string segment;
+    while(getline(strTemp,segment,';'))
+    {
+        string_separate.push_back(segment);
+    }
+    return string_separate;
+}
 
 
 
