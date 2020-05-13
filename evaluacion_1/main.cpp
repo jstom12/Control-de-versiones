@@ -14,16 +14,16 @@
 
 using namespace std;
 
-bool administrador_inicio();
-void anadir_clave();
-void ver_inventario();
-void modificar_inventario();
-void agregar_producto();
-void eliminar_producto();
-void reporte_diario();
-vector<producto> obtener_productos_disponibles();
+bool administrador_inicio(); //hecho
+void anadir_clave(); //hecho
+void ver_inventario(); //hecho
+void modificar_inventario(); //hecho
+void agregar_producto(); //hecho
+void eliminar_producto(); //hecho
+void reporte_diario(); //espera
+vector<producto> obtener_productos_disponibles(); //hecho
 void combos(vector<producto> );
-vector<string> separar_string(string );
+vector<string> separar_string(string ); //hecho
 
 
 int main()
@@ -40,7 +40,7 @@ int main()
         if(administrador_inicio()==true)
         {
             cout<<endl;
-            cout<<"opcion:\n1)Ver inventario.\n2)Modificar inventario.\n3)Crear combos.\n4)modificar un producto en el inventario.\n5)Ver reporte del dia.."<<endl;
+            cout<<"opcion:\n1)Ver inventario.\n2)Modificar inventario.\n3)Modificar combos.\n4)modificar un producto en el inventario.\n5)Ver reporte del dia.."<<endl;
             int opcion_administrador;
             cin>>opcion_administrador;
             switch (opcion_administrador) {
@@ -56,6 +56,8 @@ int main()
                 break;
             case 3:
             {
+                vector<producto> productos=obtener_productos_disponibles();
+                combos(productos);
 
             }
                 break;
@@ -290,7 +292,7 @@ void agregar_producto()
         cout<<"Ingrese el costo que tiene el producto"<<endl;
         getline(cin,producto);
         archivo << producto << ";" << endl;
-        cout<<"¿Desea continuar agregando elementos?(1/si 0/no"<<endl;
+        cout<<"¿Desea continuar agregando elementos?(1/si 0/no)"<<endl;
         cin>>proceso;
     }
     archivo.close();
@@ -299,17 +301,15 @@ vector<producto> obtener_productos_disponibles()
 {
     //int contador=0;
     ifstream archivo("data.txt");
-    string linea,aux_temp;
+    string linea;
     producto producto_temporal;
     vector<producto>products;
     vector<string> linea_actual;
     //vector<string>auxiliar;
     while(getline(archivo,linea))
     {
-
         linea_actual=separar_string(linea);
         producto_temporal.setNombre(linea_actual[0]);
-        string auxliar=aux_temp;
         int size_1=linea_actual[1].size();
         char aux_convertir[size_1];
         for(int i=0;i<size_1;i++)
@@ -326,6 +326,34 @@ vector<producto> obtener_productos_disponibles()
         }
         number = atoi(aux_convertir2);
         producto_temporal.setPrecio(number);
+        if(size_1>3)
+        {
+            list<int> obt_combos;
+            vector<string>::iterator it;
+            it=linea_actual.begin();
+            int contador=0;
+            while(it!=linea_actual.end())
+            {
+
+                if(contador>2)
+                {
+                    string aux_iterator;
+                    aux_iterator=*it;
+                    char aux_con[aux_iterator.size()];
+                    for(int i=0;i<aux_iterator.size();i++)
+                    {
+                        aux_con[i]=aux_iterator[i];
+                    }
+                    number = atoi(aux_con);
+                    obt_combos.push_back(number);
+                }
+                it++;
+                contador++;
+            }
+           producto_temporal.setCombos(obt_combos);
+           obt_combos.clear();
+           contador=0;
+        }
         if(producto_temporal.getCantidad()>0)
         {
            products.push_back(producto_temporal);
@@ -375,63 +403,24 @@ vector<producto> obtener_productos_disponibles()
 void combos(vector<producto> productos)
 {
     fstream archivo;
-    archivo.open("dataCombos.txt");
-    cout<<"1)Crear combo.\n2)Eliminar combo."<<endl;
+    archivo.open("data.txt");
+    cout<<"1)Ver combos disponibles.\n2)Crear combo.\n3)Eliminar combo"<<endl;
     int choose;
     cin>>choose;
     if(choose==1)
     {
-        string linea;
-        int contador=1;
-        while(getline(archivo,linea))
-        {
-            istringstream isstream(linea);
-            while(!isstream.eof() && contador==1)
-            {
 
-            }
-        }
-        cout<<"Productos disponibles: "<<endl;
-        vector<producto>::iterator it;
-        it=productos.begin();
-        while(it!=productos.end())
-        {
-            if(it->getCantidad()>0)cout<<it->getNombre()<<endl;
-
-        }
-        int opcion=1;
-        while(opcion==1)
-        {
-        cout<<"ingrese el primer producto y la cantidad que quiere en el combo: (ejemplo: gaseosa 1)"<<endl;
-        string producto_1;
-        getline(cin,producto_1);
-        archivo << producto_1 <<" ";
-        cout<<"Ingrese el segundo producto y la cantidad que quiere en el combo: (ejemplo: papas 2"<<endl;
-        getline(cin,producto_1);
-        archivo << producto_1<<endl;
-        cout<<endl;
-        cout<<"Combo creado."<<endl;
-        cout<<"¿Desea seguir creando combos?(1/si 0/no)"<<endl;
-        cin>>opcion;
-        }
 
     }
     else if(choose==2)
     {
-        string linea;
-        while(getline(archivo,linea))
-        {
-            istringstream isstream(linea);
-            while(!isstream.eof())
-            {
 
-            }
-        }
     }
-    else
+    else if(choose==3)
     {
-        cout<<"saliendo..."<<endl;
+
     }
+
     archivo.close();
 }
 vector<string> separar_string(string linea)
