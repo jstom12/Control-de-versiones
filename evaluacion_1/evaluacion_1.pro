@@ -4,8 +4,10 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        combo.cpp \
         main.cpp \
         producto.cpp
 
 HEADERS += \
+    combo.h \
     producto.h

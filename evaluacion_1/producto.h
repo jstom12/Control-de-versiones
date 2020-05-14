@@ -2,7 +2,7 @@
 #define PRODUCTO_H
 //#include <map>
 #include <string>
-#include <list>
+#include <vector>
 
 using namespace std;
 
@@ -11,7 +11,7 @@ class producto
     string nombre;
     int cantidad;
     double precio;
-    list<int> combos;
+    vector<int> combos;
 
 public:
     producto();
@@ -26,8 +26,8 @@ public:
     void setCantidad(int value);
     double getPrecio() const;
     void setPrecio(double value);
-    list<int> getCombos() const;
-    void setCombos(const list<int> &value);
+    vector<int> getCombos() const;
+    void setCombos(const vector<int> &value);
 };
 
 #endif // PRODUCTO_H

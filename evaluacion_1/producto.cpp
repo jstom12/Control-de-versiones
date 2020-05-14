@@ -30,12 +30,12 @@ void producto::setPrecio(double value)
     precio = value;
 }
 
-list<int> producto::getCombos() const
+vector<int> producto::getCombos() const
 {
     return combos;
 }
 
-void producto::setCombos(const list<int> &value)
+void producto::setCombos(const vector<int> &value)
 {
     combos = value;
 }

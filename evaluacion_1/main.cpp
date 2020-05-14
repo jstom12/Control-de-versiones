@@ -11,6 +11,7 @@
 #include <vector>
 #include <producto.h>
 #include <conio.h>
+#include <combo.h>
 
 using namespace std;
 
@@ -24,11 +25,15 @@ void reporte_diario(); //espera
 vector<producto> obtener_productos_disponibles(); //hecho
 void combos(vector<producto> );
 vector<string> separar_string(string ); //hecho
+vector<string> separar_stringAux(string );
+void ver_combos();
+map<int,combo> obtener_combos_disponibles(vector<producto> );
 
 
 int main()
 {
-    obtener_productos_disponibles();
+    vector<producto> db = obtener_productos_disponibles();
+    obtener_combos_disponibles(db);
     cout<<"-----¡Bienvenido!-----"<<endl;
     cout<<"---Ingrese una opcion---"<<endl;
     cout<<"1) Ingresar como administrador.\n2) Ingresar como usuario.\n"<<endl;
@@ -81,6 +86,9 @@ int main()
         getline(cin,usuario);
         getline(cin,usuario);
         cout<<"¡Hola "<<usuario<<"!\n ¿Que deseas realizar?"<<endl;
+        cout<<"1) Ver combos"<<endl;
+
+        ver_combos();
 
     }
     default:
@@ -326,9 +334,9 @@ vector<producto> obtener_productos_disponibles()
         }
         number = atoi(aux_convertir2);
         producto_temporal.setPrecio(number);
-        if(size_1>3)
+        /*if(size_1>3)
         {
-            list<int> obt_combos;
+            vector<int> obt_combos;
             vector<string>::iterator it;
             it=linea_actual.begin();
             int contador=0;
@@ -353,7 +361,7 @@ vector<producto> obtener_productos_disponibles()
            producto_temporal.setCombos(obt_combos);
            obt_combos.clear();
            contador=0;
-        }
+        }*/
         if(producto_temporal.getCantidad()>0)
         {
            products.push_back(producto_temporal);
@@ -434,10 +442,140 @@ vector<string> separar_string(string linea)
     }
     return string_separate;
 }
+void ver_combos()
+{
+    ifstream archivo("data_combos.txt");
+    string linea;
+    vector<string> combos;
+    //vector<string> producto_cant;
+    map<int,string> mostrar_combos;
+    int clave=1;
+    while(getline(archivo,linea))
+    {
+        combos = separar_string(linea);
+        mostrar_combos.insert(pair<int,string>(clave,combos[0]));
+        combos.clear();
+        clave++;
+    }
+    archivo.close();
+
+    map<int,string>::iterator it;
+    it = mostrar_combos.begin();
+    cout<<"ID     "<<"Nombre combo"<<endl;
+    while(it!=mostrar_combos.end())
+    {
+        cout << it->first << "     " << it->second << endl;
+        it++;
+    }
+
+    archivo.close();
+    /*
+    vector<int> claves;
+    vector<string> valores;
+    vector<producto>::iterator it;
+    map<int,vector<string>> combos_result;
+    it=productos.begin();
+    while(it!=productos.end())
+    {
+        vector<int> combos;
+        combos = it->getCombos();
+        vector<int>::iterator itm;
+        itm = combos.begin();
+        while(itm!=combos.end())
+        {
+
+            claves.push_back(*itm);
+        }
 
 
-
-
+    }*/
+}
+vector<string> separar_stringAux(string linea)
+{
+    vector<string> string_separate;
+    stringstream strTemp(linea);
+    string segment;
+    while(getline(strTemp,segment,'_'))
+    {
+        string_separate.push_back(segment);
+    }
+    return string_separate;
+}
+map<int,combo> obtener_combos_disponibles(vector<producto> productos)
+{
+    ifstream archivo("data_combos.txt");
+    string linea;
+    vector<string> combos , separador;
+    vector<producto> componentes;
+    producto _aux;
+    combo combo_aux;
+    map<int,combo> combos_data;
+    int i=0;
+    while(getline(archivo,linea))
+    {
+        combos = separar_string(linea);
+        for(i=0;i<combos.size();i++)
+        {
+            if(i==0)
+            {
+                combo_aux.setNombre(combos[0]);
+            }
+            else if(i>0)
+            {
+                separador = separar_stringAux(combos[i]);
+                _aux.setNombre(separador[0]);
+                int size = separador[1].size();
+                char convert[size];
+                for(int j=0;j<size;j++)
+                {
+                    convert[j]=separador[1][j];
+                }
+                int number = atoi(convert);
+                _aux.setCantidad(number);
+                componentes.push_back(_aux);
+            }
+        }
+        combo_aux.setComponentes(componentes);
+        componentes.clear();
+        i++;
+        combos_data.insert(pair<int,combo>(i,combo_aux));
+    }
+    archivo.close();
+    map<int,combo>::iterator it;
+    vector<producto>::iterator it_productos , it_componentes;
+    bool disponibilidad=true;
+    int prize=0;
+    for(it=combos_data.begin();it!=combos_data.end();it++)
+    {
+       it_componentes = it->second.getComponentes().begin();
+       linea = it_componentes->getNombre();
+       i = it_componentes->getCantidad();
+       it_productos = productos.begin();
+       while(it_productos!=productos.end())
+       {
+           if(linea==it_productos->getNombre())
+           {
+               if(i<=it_productos->getCantidad())
+               {
+                   disponibilidad=true;
+                   prize += it_productos->getPrecio();
+               }
+               else
+                {
+                    disponibilidad=false;
+                }
+           }
+           else
+           {
+               disponibilidad=false;
+           }
+       }
+       if(disponibilidad==false)combos_data.erase(it);
+       else if(disponibilidad==true)it_componentes->setPrecio(prize);
+       prize=0;
+    }
+    return combos_data;
+}
 
 
 
