@@ -21,12 +21,14 @@ void ver_inventario(); //hecho
 void modificar_inventario(); //hecho
 void agregar_producto(); //hecho
 void eliminar_producto(); //hecho
-void reporte_diario(); //espera
+void reporte_diario(string,vector<producto>, int); //espera
 vector<producto> obtener_productos_disponibles(); //hecho
 vector<string> separar_string(string ); //hecho
-void compras(vector<producto> );
+void compras(vector<producto> , string);
 void pago_productos(int );
 void cambio_inventario(vector<producto> );
+void actualizar_inventario(map<int,producto> );
+
 
 int main()
 {
@@ -82,7 +84,7 @@ int main()
         getline(cin,usuario);
         cout<<"¡Hola "<<usuario<<"!\n Mira nuestro menu y elije tu compra por favor:"<<endl;
         vector<producto> productos_disp = obtener_productos_disponibles();
-        compras(productos_disp);
+        compras(productos_disp , usuario);
     }
     default:
         break;
@@ -406,13 +408,12 @@ vector<string> separar_string(string linea)
     }
     return string_separate;
 }
-void compras(vector<producto> productos)
+void compras(vector<producto> productos , string usuario)
 {
     vector<producto>::iterator it;
     it= productos.begin();
     int clave = 1;
     map<int,producto> productos_eleccion;
-
     while(it!=productos.end())
     {
         productos_eleccion.insert(pair<int,producto>(clave,*it));
@@ -429,21 +430,28 @@ void compras(vector<producto> productos)
     }
     int comprando=1;
     vector<producto> compras;
-    vector<int> opciones;
+    //vector<int> opciones;
     while(comprando==1)
     {
         cout<<"elija el producto que desea comprar"<<endl;
         int op;
         cin>>op;
-        producto compra_aux = productos_eleccion.at(op);
-        compras.push_back(compra_aux);
-        opciones.push_back(op);
+        producto aux = productos_eleccion[op];
+        if(aux.getCantidad()>=1)
+        {
+            int cant = aux.getCantidad();
+            cant -=1;
+            aux.setCantidad(cant);
+            compras.push_back(aux);
+            productos_eleccion.erase(op);
+            productos_eleccion.insert(pair<int,producto>(op,aux));
+            //opciones.push_back(op);
+        }
         cout<<"Desea seguir comprando?(si/1 no/0)"<<endl;
         cin>>comprando;
     }
     it = compras.begin();
     clave=0;
-
     while(it!=compras.end())
     {
         clave += it->getPrecio();
@@ -460,8 +468,14 @@ void compras(vector<producto> productos)
         cin>>pago;
         if(pago==0)return;
     }
-    pago = pago-clave;
-    itm = productos_eleccion.begin();
+    if(pago>clave)
+    {
+        reporte_diario(usuario,compras,clave);
+        pago = pago-clave;
+        actualizar_inventario(productos_eleccion);
+        pago_productos(pago);
+    }
+    /*itm = productos_eleccion.begin();
     while(itm!=productos_eleccion.end())
     {
         int buscador = itm->first;
@@ -481,9 +495,8 @@ void compras(vector<producto> productos)
         itm->second.setCantidad(cant);
         cant=0;
         itm++;
-    }
+    }*/
 
-    pago_productos(pago);
 }
 void pago_productos(int numero)
 {
@@ -521,7 +534,29 @@ void pago_productos(int numero)
        cout<<"moneda de: 50: "<<moneda4<<endl;
        cout<<"faltante: "<<numero<<endl;
 }
-void cambio_inventario(vector<producto> productos_cambio )
+void actualizar_inventario(map<int,producto> productos)
 {
-
+    ofstream archivo("data.txt");
+    map<int,producto>::iterator it;
+    it=productos.begin();
+    while(it!=productos.end())
+    {
+        archivo << it->second.getNombre() <<";"<<it->second.getCantidad() <<";"<<it->second.getPrecio()<<";"<<endl;
+        it++;
+    }
+    archivo.close();
+}
+void reporte_diario(string usuario ,vector<producto> compras , int pago)
+{
+    ofstream archivo("ventas.txt",ios::app|ios::ate);
+    archivo << usuario<<":";
+    vector<producto>::iterator it;
+    it=compras.begin();
+    while(it!=compras.end())
+    {
+        archivo<<it->getNombre()<<",";
+    }
+    string prize = to_string(pago);
+    archivo << prize <<";";
+    archivo.close();
 }

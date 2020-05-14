@@ -11,7 +11,7 @@ class producto
     string nombre;
     int cantidad;
     double precio;
-    vector<int> combos;
+
 
 public:
     producto();
@@ -26,8 +26,6 @@ public:
     void setCantidad(int value);
     double getPrecio() const;
     void setPrecio(double value);
-    vector<int> getCombos() const;
-    void setCombos(const vector<int> &value);
 };
 
 #endif // PRODUCTO_H
