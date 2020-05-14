@@ -25,6 +25,8 @@ void reporte_diario(); //espera
 vector<producto> obtener_productos_disponibles(); //hecho
 vector<string> separar_string(string ); //hecho
 void compras(vector<producto> );
+void pago_productos(int );
+void cambio_inventario(vector<producto> );
 
 int main()
 {
@@ -427,6 +429,7 @@ void compras(vector<producto> productos)
     }
     int comprando=1;
     vector<producto> compras;
+    vector<int> opciones;
     while(comprando==1)
     {
         cout<<"elija el producto que desea comprar"<<endl;
@@ -434,16 +437,91 @@ void compras(vector<producto> productos)
         cin>>op;
         producto compra_aux = productos_eleccion.at(op);
         compras.push_back(compra_aux);
+        opciones.push_back(op);
         cout<<"Desea seguir comprando?(si/1 no/0)"<<endl;
         cin>>comprando;
     }
     it = compras.begin();
     clave=0;
+
     while(it!=compras.end())
     {
         clave += it->getPrecio();
         it++;
     }
     cout << "el precio total es: "<<clave<<endl;
+    cout<<"digite la cantidad con la que va a pagar:"<<endl;
+    int pago;
+    cin>>pago;
+    while(pago<clave)
+    {
+        cout<<"pago insuficiente "<<endl;
+        cout<<"digite por favor un pago valido o introduzca 0 para salir"<<endl;
+        cin>>pago;
+        if(pago==0)return;
+    }
+    pago = pago-clave;
+    itm = productos_eleccion.begin();
+    while(itm!=productos_eleccion.end())
+    {
+        int buscador = itm->first;
+        vector<int>::iterator it_numeros;
+        it_numeros=opciones.begin();
+        int cant=0;
+        while(it_numeros!=opciones.end())
+        {
+            if(*it_numeros==buscador)
+            {
+                cant--;
+                it_numeros++;
+            }
+            it_numeros++;
+        }
+        cant += itm->second.getCantidad() + cant;
+        itm->second.setCantidad(cant);
+        cant=0;
+        itm++;
+    }
+
+    pago_productos(pago);
+}
+void pago_productos(int numero)
+{
+    int billete1=0 , billete2=0 , billete3=0 , billete4=0 , billete5=0 , billete6=0 , moneda1=0 , moneda2=0 , moneda3=0 , moneda4=0 ;
+       billete1=numero/50000;
+       numero=numero%50000;
+       billete2=numero/20000;
+       numero=numero%20000;
+       billete3=numero/10000;
+       numero=numero%10000;
+       billete4=numero/5000;
+       numero=numero%5000;
+       billete5=numero/2000;
+       numero=numero%2000;
+       billete6=numero/1000;
+       numero=numero%1000;
+       moneda1=numero/500;
+       numero=numero%500;
+       moneda2=numero/200;
+       numero=numero%200;
+       moneda3=numero/100;
+       numero=numero%100;
+       moneda4=numero/50;
+       numero=numero%50;
+       cout<<"Sus vueltas son:"<<endl;
+       cout<<"billete de: 50000: "<<billete1<<endl;
+       cout<<"billete de: 20000: "<<billete2<<endl;
+       cout<<"billete de: 10000: "<<billete3<<endl;
+       cout<<"billete de: 5000: "<<billete4<<endl;
+       cout<<"billete de: 2000: "<<billete5<<endl;
+       cout<<"billete de: 1000: "<<billete6<<endl;
+       cout<<"moneda de: 500: "<<moneda1<<endl;
+       cout<<"moneda de: 200: "<<moneda2<<endl;
+       cout<<"moneda de: 100: "<<moneda3<<endl;
+       cout<<"moneda de: 50: "<<moneda4<<endl;
+       cout<<"faltante: "<<numero<<endl;
+}
+void cambio_inventario(vector<producto> productos_cambio )
+{
 
 }
