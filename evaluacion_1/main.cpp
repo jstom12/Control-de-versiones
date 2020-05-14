@@ -35,6 +35,7 @@ int main()
 {
     vector<producto> db = obtener_productos_disponibles();
     vector<combo> combuos = obtener_combos_disponibles();
+    map<int,combo> comcom = combos_disponibles(db,combuos);
     cout<<"-----¡Bienvenido!-----"<<endl;
     cout<<"---Ingrese una opcion---"<<endl;
     cout<<"1) Ingresar como administrador.\n2) Ingresar como usuario.\n"<<endl;
@@ -422,20 +423,22 @@ vector<combo> obtener_combos_disponibles()
     archivo.close();
     return combos_data;
 }
-map<int,combo> generar_combos_predeterminados(vector<producto> productos_disponibles )
+/*map<int,combo> generar_combos_predeterminados(vector<producto> productos_disponibles )
 {
     map<int,combo> combos_disponibles;
     vector<producto>::iterator it;
     it=productos_disponibles.begin();
-}
+}*/
 map<int,combo> combos_disponibles(vector<producto> productos , vector<combo> combos )
 {
     vector<producto>::iterator it_producto , it_componente;
     vector<combo>::iterator it_combos;
     vector<producto> aux_componente;
+    combo aux;
     vector<combo> comp_aux;
-    map<int,vector<combo>> combos_disponibles;
+    map<int,combo> combos_disponibles;
     int clave=1;
+    bool disponibilidad = true;
     it_combos = combos.begin();
     it_producto = productos.begin();
     while(it_combos!=combos.end())
@@ -454,13 +457,30 @@ map<int,combo> combos_disponibles(vector<producto> productos , vector<combo> com
                 cant_componente = it_componente->getCantidad();
                 if(cant_componente<cant_producto)
                 {
-
+                    disponibilidad = true;
+                    it_componente++;
+                }
+                else
+                {
+                    disponibilidad = false;
+                    it_componente++;
                 }
             }
+            else if(it_producto == productos.end())
+            {
+                disponibilidad = false;
+                it_componente++;
+            }
+            it_producto++;
         }
+        if(disponibilidad==true)
+        {
+            combos_disponibles.insert(pair<int,combo>(clave,*it_combos));
+            clave++;
+        }
+        it_combos++;
+        it_producto = productos.begin();
     }
-
-
-
+    return combos_disponibles;
 }
 
