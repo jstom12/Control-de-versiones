@@ -21,14 +21,15 @@ void ver_inventario(); //hecho
 void modificar_inventario(); //hecho
 void agregar_producto(); //hecho
 void eliminar_producto(); //hecho
-void reporte_diario(string,vector<producto>, int); //espera
+void reporte_diario(string,vector<producto>, int); //hecho
 vector<producto> obtener_productos_disponibles(); //hecho
 vector<string> separar_string(string ); //hecho
-void compras(vector<producto> , string);
-void pago_productos(int );
-void cambio_inventario(vector<producto> );
-void actualizar_inventario(map<int,producto> );
-
+void compras(vector<producto> , string); //hecho
+void pago_productos(int ); //hecho
+void cambio_inventario(vector<producto> ); //hecho
+void actualizar_inventario(map<int,producto> ); //hecho
+void ver_reporte();
+void asiento_cine();
 
 int main()
 {
@@ -43,7 +44,7 @@ int main()
         if(administrador_inicio()==true)
         {
             cout<<endl;
-            cout<<"opcion:\n1)Ver inventario.\n2)Modificar inventario.\n3)Modificar combos.\n4)modificar un producto en el inventario.\n5)Ver reporte del dia.."<<endl;
+            cout<<"opcion:\n1)Ver inventario.\n2)Modificar inventario.\n3)Ver reporte del dia."<<endl;
             int opcion_administrador;
             cin>>opcion_administrador;
             switch (opcion_administrador) {
@@ -59,13 +60,7 @@ int main()
                 break;
             case 3:
             {
-
-
-            }
-                break;
-            case 4:
-            {
-
+                ver_reporte();
             }
                 break;
             default:
@@ -85,6 +80,8 @@ int main()
         cout<<"¡Hola "<<usuario<<"!\n Mira nuestro menu y elije tu compra por favor:"<<endl;
         vector<producto> productos_disp = obtener_productos_disponibles();
         compras(productos_disp , usuario);
+        cout<<"a continuacion digite su asiento"<<endl;
+        asiento_cine();
     }
     default:
         break;
@@ -554,9 +551,71 @@ void reporte_diario(string usuario ,vector<producto> compras , int pago)
     it=compras.begin();
     while(it!=compras.end())
     {
-        archivo<<it->getNombre()<<",";
+        archivo<<it->getNombre()<<";";
+        it++;
     }
     string prize = to_string(pago);
     archivo << prize <<";";
     archivo.close();
+}
+void ver_reporte()
+{
+    ifstream archivo("ventas.txt");
+    string linea;
+    cout<<"usuario     "<<"productos comprados     "<<"precio venta"<<endl;
+    while(getline(archivo,linea))
+    {
+        vector<string> linea_sep = separar_string(linea);
+        cout<<linea_sep[0]<<"     ";
+        vector<string>::iterator it;
+        it=linea_sep.begin();
+        it++;
+        while(it!=linea_sep.end())
+        {
+            cout<<*it<<"  ";
+            it++;
+        }
+        cout<<endl;
+    }
+    archivo.close();
+}
+void asiento_cine()
+{
+    char cine[15][20] ;
+        int asiento=0 , aux_numeros=0 , opcion_2=1;
+        char fila=0 , aux=65;
+        int opcion=1;
+        for (int i=0 ; i<15 ; i++){ // se genera la sala de cine con ningun asiento reservado.
+            for (int j=0 ; j<20 ; j++){
+                cine[i][j]=45;
+            }
+        }
+        do{ // se le pide al usuario la reserva que va a realizar.
+        cout<<"ingrese la fila (A-O)"<<endl;
+        cin>>fila;
+        cout<<"ingrese el asiento (1-20)"<<endl;
+        cin>>asiento;
+        asiento = asiento-1; //se le resta 1 al numero ingresado para que coincida con las posiciones del vector.
+        opcion=1;
+        while(opcion==1)
+        {
+            if(fila==aux){ // si la fila es exactamente igual al auxiliar, se marca la reserva en el vector.
+                cine[aux_numeros][asiento]='+';
+                opcion=0;
+            }
+            else //de lo contrario,se le suma uno al caracter del auxiliar y uno al auxiliar_numeros.
+            {
+                aux_numeros++;
+                aux++;
+            }
+        }
+        for(int i=0;i<15;i++) //se imprime la matriz.
+        {
+            for(int j=0;j<20;j++)
+                cout<<cine[i][j];
+        cout<<endl;
+        }
+        cout<<"desea seleccionar mas asientos?(si/1 no/0)"<<endl;//se le pregunta al usuario si quiere seguir reservando.
+        cin>>opcion_2;
+        }while(opcion_2==1);
 }
