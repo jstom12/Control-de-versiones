@@ -193,7 +193,7 @@ void anadir_clave()
     getline(cin,clave);
     temp << clave;
     cout<<"Procesando..."<<endl;
-    cout<<"Nueva clave creada."<<endl;
+    cout<<"Nueva clave creada. IMPORTANTE, DESPUES DE ESTE PROCESO: ESCRIBIR LA CLAVE Y DAR ENTER, LUEGO VOLVER A COPIAR LA CLAVE Y DAR ENTER."<<endl;
     temp.close();
 
 }
