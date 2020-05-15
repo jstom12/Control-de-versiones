@@ -33,60 +33,67 @@ void asiento_cine();
 
 int main()
 {
-    cout<<"-----¡Bienvenido!-----"<<endl;
-    cout<<"---Ingrese una opcion---"<<endl;
-    cout<<"1) Ingresar como administrador.\n2) Ingresar como usuario.\n"<<endl;
-    int opcion;
-    cin>>opcion;
-    switch (opcion) {
-    case 1:
+    int proceso_activo=1;
+    while(proceso_activo==1)
     {
-        if(administrador_inicio()==true)
+        cout<<"-----¡Bienvenido!-----"<<endl;
+        cout<<"---Ingrese una opcion---"<<endl;
+        cout<<"1) Ingresar como administrador.\n2) Ingresar como usuario.\n"<<endl;
+        int opcion;
+        cin>>opcion;
+        switch (opcion) {
+        case 1:
         {
-            cout<<endl;
-            cout<<"opcion:\n1)Ver inventario.\n2)Modificar inventario.\n3)Ver reporte del dia."<<endl;
-            int opcion_administrador;
-            cin>>opcion_administrador;
-            switch (opcion_administrador) {
-            case 1:
+            if(administrador_inicio()==true)
             {
-                ver_inventario();
-            }
-                break;
-            case 2:
-            {
-                modificar_inventario();
-            }
-                break;
-            case 3:
-            {
-                ver_reporte();
-            }
-                break;
-            default:
-                break;
+                cout<<endl;
+                cout<<"opcion:\n1)Ver inventario.\n2)Modificar inventario.\n3)Ver reporte del dia."<<endl;
+                int opcion_administrador;
+                cin>>opcion_administrador;
+                switch (opcion_administrador) {
+                case 1:
+                {
+                    ver_inventario();
+                }
+                    break;
+                case 2:
+                {
+                    modificar_inventario();
+                }
+                    break;
+                case 3:
+                {
+                    ver_reporte();
+                }
+                    break;
+                default:
+                    break;
+                }
+
             }
 
         }
+            break;
+        case 2:
+        {
+            cout<<"Bienvenido, por favor indentifiquese:"<<endl;
+            string usuario;
+            getline(cin,usuario);
+            getline(cin,usuario);
+            cout<<"¡Hola "<<usuario<<"!\n Mira nuestro menu y elije tu compra por favor:"<<endl;
+            vector<producto> productos_disp = obtener_productos_disponibles();
+            compras(productos_disp , usuario);
+            cout<<"a continuacion digite su asiento"<<endl;
+            asiento_cine();
+        }
+        default:
+            break;
 
+        }
+        cout<<"Desea seguir en el programa?(si/1 no/0)"<<endl;
+        cin>>proceso_activo;
     }
-        break;
-    case 2:
-    {
-        cout<<"Bienvenido, por favor indentifiquese:"<<endl;
-        string usuario;
-        getline(cin,usuario);
-        getline(cin,usuario);
-        cout<<"¡Hola "<<usuario<<"!\n Mira nuestro menu y elije tu compra por favor:"<<endl;
-        vector<producto> productos_disp = obtener_productos_disponibles();
-        compras(productos_disp , usuario);
-        cout<<"a continuacion digite su asiento"<<endl;
-        asiento_cine();
-    }
-    default:
-        break;
 
-    }
 
 }
 
@@ -116,6 +123,7 @@ bool administrador_inicio()
         }
         else
         {
+            cout<<"clave incorrecta"<<endl;
             archivo.close();
             return false;
         }
@@ -137,15 +145,24 @@ void ver_inventario()
     cout<<"Producto   Cantidad   Precio"<<endl;
     while(getline(archivo,linea))
     {
-        vector<string> linea_actual;
-        linea_actual=separar_string(linea);
+        /*
+        En esta parte, se recibe una linea del texto que equivale a un producto del inventario,
+        el nombre, la cantidad en inventario y el precio estan separados por el char ';',
+        por lo que se invoca una funcion que separa esta linea en un vector de strings y así
+        se maneja mas facil la impresion del producto.
+        */
+        vector<string> linea_actual;//Se elije usar un tipo vector porque hay que recorrer el vector entero y esto
+        linea_actual=separar_string(linea);//es una ventaja frente al tipo list.
         for(int i=0;i<3;i++)
         {
             cout<<linea_actual[i]<<"    ";
         }
         cout<<endl;
         contador++;
-        /*istringstream isstream(linea);
+        /*
+         * -IGNORAR CONDIGO OBSOLETO-
+         *
+         * istringstream isstream(linea);
         while(!isstream.eof())
         {
            string temp , aux;
@@ -166,7 +183,7 @@ void anadir_clave()
 {
     /*
     En esta funcion se abre un archivo de texto en modo escritura y se le pide al usuario que
-    ingrese la clave que desea para crearla.
+    ingrese la clave que desea para almacenarla en el archivo.
     */
     string clave;
     ofstream temp;
@@ -184,7 +201,9 @@ void modificar_inventario()
 {
     /*
     En esta funcion solo se muestra el menu donde estan las opciones para modificar el inventario;
-    elegida una opcion se procede entonces a invocar la funcion que realiza tal accion.
+    elegida una opcion se procede entonces a invocar la funcion que realiza tal accion. Ninguna
+    de las funciones recibe algo parametro porque dentro de ellas se opera directamente con el archivo
+    de texto.
     */
     int opcion;
     cout<<"1) Agregar para agregar producto.\n2) Eliminar un producto"<<endl;
@@ -215,16 +234,28 @@ void eliminar_producto()
     cout<<"¿Que producto desea eliminar del inventario?"<<endl;
     getline(cin,producto);
     getline(cin,producto);
-    while(getline(archivo,linea))//empezamos a recorrer el archivo linea por linea y
-    {                           //con la funcion .find, buscamos conocer si el producto no se encuentra
+    while(getline(archivo,linea))
+    { /*
+        empezamos a recorrer el archivo linea por linea y
+        con la funcion .find, buscamos conocer si el producto no se encuentra
+        en la linea donde se posiciona el archivo, esto de ser cierto se pasa entonces
+        a escribir en el otro archivo la linea de texto que no correspondría a la linea
+        que buscamos.
+        */
         int pos=linea.find(producto);
-        if(pos==-1)//en la linea donde se posiciona el archivo, esto de ser cierto se pasa entonces
+        if(pos==-1)
         {
-            temp << linea << endl; //a escribir en el otro archivo la linea de texto.
+            temp << linea << endl;
         }
         else if(pos!=-1)
-        {
-            //int limite=0;
+        {/*
+        si pos es != -1 significa que se encontró en la linea el producto que deseamos eliminar,
+        por lo tanto separamos la linea en un vector de string como se viene haciendo y
+        procedemos a recorrer el vector para chequear que el nombre del producto en la linea
+        y el que ingresó el usuario para eliminar sean iguales y así no copiar esta linea al nuevo
+        archivo .txt
+        */
+
             vector<string> linea_actual;
             linea_actual=separar_string(linea);
             for(int i=0;i<linea_actual.size();i++)
@@ -235,7 +266,8 @@ void eliminar_producto()
                 }
             }
 
-            /*istringstream isstream(linea);
+            /*-IGNORAR CODIGO OBSOLETO-
+             * istringstream isstream(linea);
             while(!isstream.eof())
             {
                string temp__;
@@ -256,6 +288,10 @@ void eliminar_producto()
             }*/
         }
     }
+    /*
+    se cierran los archivos y acá se elimina el viejo data.txt y se le cambia el nombre al
+    nuevo archivo que corresponde al inventario menos el producto que se quiso eliminar.
+    */
     archivo.close();
     temp.close();
     remove("data.txt");
@@ -294,7 +330,15 @@ void agregar_producto()
 }
 vector<producto> obtener_productos_disponibles()
 {
-    //int contador=0;
+    /*
+    Lo que pretende esta funcion es: abrir el archivo de texto donde esta almacenado los datos
+    de los productos en inventario y pasarlos a un vector compuesto por el tipo producto que es
+    una clase creada en este codigo.
+    Para ello abrimos el archivo en modo lectura, creamos una variable producto que será usada
+    para almacenas el producto que se vaya recogiendo en el ciclo, un vecto<producto> que es donde se
+    agregaran los productos que se van obteniendo y un vector<string> para separar la linea
+    de codigo y manejarla de manera mas sencilla.
+    */
     ifstream archivo("data.txt");
     string linea;
     producto producto_temporal;
@@ -303,6 +347,15 @@ vector<producto> obtener_productos_disponibles()
     //vector<string>auxiliar;
     while(getline(archivo,linea))
     {
+        /*
+        la posicion 0 del vector<string> equivale al nombre del producto, la posicion 1 a la cantidad
+        disponible en el inventario de este y la posicion 3 equivale al precio del producto.
+        para la posicion 0 solo hay que invocar la funcion para obtener el nombre de la clase producto
+        pero para la cantidad y el precio, dado que la clase los recibe como enteros, se debe pasar
+        a un arreglo de char para poder usar la funcion atoi() que convierte un arreglo de char en
+        entero. Hecho esto se agregan al producto y este producto se agrega al vector<producto> así hasta
+        acabar las lineas del archivo.
+        */
         linea_actual=separar_string(linea);
         producto_temporal.setNombre(linea_actual[0]);
         int size_1=linea_actual[1].size();
@@ -348,7 +401,7 @@ vector<producto> obtener_productos_disponibles()
            obt_combos.clear();
            contador=0;
         }*/
-        if(producto_temporal.getCantidad()>0)
+        if(producto_temporal.getCantidad()>0) // verificamos que la cantidad sea mayor a 0 y agregamos al vector<producto>
         {
            products.push_back(producto_temporal);
         }
@@ -396,6 +449,12 @@ vector<producto> obtener_productos_disponibles()
 }
 vector<string> separar_string(string linea)
 {
+    /*
+    La funcion de separar string fue necesaria para facilitar el manejo del archivo de texto
+    por lo que se encontró esta funcion en internet que no es propia pero usa un elemento de la
+    clase stringstream que recorre un string cada que encuentro un char declarado en la funcion
+    y se añade a un vector<string> para luego retornar ese vector<string>.
+    */
     vector<string> string_separate;
     stringstream strTemp(linea);
     string segment;
@@ -407,6 +466,16 @@ vector<string> separar_string(string linea)
 }
 void compras(vector<producto> productos , string usuario)
 {
+    /*
+    En esta funcion se realiza la compra por parte del usuario, obtiene como parametros un vector<producto>
+    que corresponde a los productos disponibles en el inventario, y un string que corresponde al nombre del
+    usuario.
+    Primero se recorre el vector<producto> y se va agregando cada posicion a un map<int,producto>
+    para facilitar la compra del usuario.
+    luego se imprime el menu para la comprar del usuario con el map recien creado, por lo tanto,
+    para comprar algo basta con introducir el ID del producto.
+
+    */
     vector<producto>::iterator it;
     it= productos.begin();
     int clave = 1;
@@ -430,6 +499,16 @@ void compras(vector<producto> productos , string usuario)
     //vector<int> opciones;
     while(comprando==1)
     {
+        /*
+        Se entra entonces a este ciclo que es para que el usuario elija los productos que va a comprar,
+        se almacena esa decision en un int que equivale a la clave en el mapa y se verifica que el producto
+        al que corresponde el valor de esa clave tenga una cantidad disponible mayor a 1, esto porque puede
+        ser el caso que en el inventario hayan 5 elementos y el usuario quisiera comprar 6, solo permitiría
+        comprar 5.
+        durante el ciclo se cambia entonces el valor de la cantidad disponible del producto
+        borrando la clave actual y creando una identica pero con la diferencia que la cantidad del producto
+        es igual a una menos.
+        */
         cout<<"elija el producto que desea comprar"<<endl;
         int op;
         cin>>op;
@@ -451,6 +530,10 @@ void compras(vector<producto> productos , string usuario)
     clave=0;
     while(it!=compras.end())
     {
+        /*
+        En este ciclo lo que se hace es extraer el precio de los productos elegidos
+        para darle el total a pagar al usuario.
+        */
         clave += it->getPrecio();
         it++;
     }
@@ -465,8 +548,13 @@ void compras(vector<producto> productos , string usuario)
         cin>>pago;
         if(pago==0)return;
     }
-    if(pago>clave)
+    if(pago>=clave)
     {
+        /*
+        Si el pago que introduce el usuario es mayor o igual al total a pagar, entonces
+        se procede a actualizar el inventario y a imprimir los billetes y monedas que hay que
+        devolverle al usuario.
+        */
         reporte_diario(usuario,compras,clave);
         pago = pago-clave;
         actualizar_inventario(productos_eleccion);
@@ -497,6 +585,13 @@ void compras(vector<producto> productos , string usuario)
 }
 void pago_productos(int numero)
 {
+    /*
+    Funcion para dar las vueltas de manera real, recibe un entero que corresponde a la diferencia entre
+    el pago que realiza el usuario y el valor total de su compra.
+    se coge el entero y se va dividiendo mientras se saca el modulo de esa division, si el modulo es un entero
+    pues se almacena en esa variable y al final muestra cuando billetes y monedas se necesitan.
+    funcion reciclada de la practica 1.
+    */
     int billete1=0 , billete2=0 , billete3=0 , billete4=0 , billete5=0 , billete6=0 , moneda1=0 , moneda2=0 , moneda3=0 , moneda4=0 ;
        billete1=numero/50000;
        numero=numero%50000;
@@ -533,6 +628,16 @@ void pago_productos(int numero)
 }
 void actualizar_inventario(map<int,producto> productos)
 {
+    /*
+    Para actualizar el inventario se recibe un map<int,producto> que se obtiene en la funcion de las compras
+    y equivale a los productos menos las cantidades compradas, obviamente los productos que no fueron comprados
+    se mantienen igual.
+
+    Se itera entonces en el mapa y se va escribiendo en el archivo linea por linea
+    con el orden que ya se tiene en la base de datos.
+
+    Al terminar el ciclo se cierra el archivo y ya estaría listos los cambios dentro del txt.
+    */
     ofstream archivo("data.txt");
     map<int,producto>::iterator it;
     it=productos.begin();
@@ -545,6 +650,16 @@ void actualizar_inventario(map<int,producto> productos)
 }
 void reporte_diario(string usuario ,vector<producto> compras , int pago)
 {
+    /*
+    El reporte diario recibe un string correspondiente al nombre del usuario, un vecto<producto>
+    correspondiente a las compras que realizó dicho usuario y un entero correspondiente al valor de
+    su compra.
+
+    Se abre el archivo en modo lectura y en ios::app|ios::ate para que el puntero se ubique en la ultima
+    posicion del archivo y empiece a escribis desde ahí. empiece a interar en el vector<producto> obteniendo
+    los nombres de estos y escribiendolos simultaneamente, todo en la misma linea, por ultimo se escribe el
+    valor de la compra y un salto de linea dejando así listo el archivo para el siguiente usuario.
+    */
     ofstream archivo("ventas.txt",ios::app|ios::ate);
     archivo << usuario<<":";
     vector<producto>::iterator it;
@@ -560,6 +675,14 @@ void reporte_diario(string usuario ,vector<producto> compras , int pago)
 }
 void ver_reporte()
 {
+    /*
+    Esta funcion imprime entonces los reportes guardados en el archivo correspondiente a las ventas que
+    se le realizan a los usuarios.
+    abre el archivo donde se guarda esta informacion y comienza a iterar en el
+    linea por linea y, como anteriormente se ha mostrado, se separa el string en un vector<string>
+    y procede a imprimir la posicion 0 de este que corresponde al nombre del usuario, luego itera
+    en las demas posiciones que corresponden a las compras de este mismo y el valor que pagó por esto.
+    */
     ifstream archivo("ventas.txt");
     string linea;
     cout<<"usuario     "<<"productos comprados     "<<"precio venta"<<endl;
@@ -581,6 +704,15 @@ void ver_reporte()
 }
 void asiento_cine()
 {
+    /*
+    Funcion reciclada de la practica 2.
+
+    se crea un arreglo char de 15x20 donde 15 equivale a las filas y 20 equivale a las columnas
+    de la sala de cine; se llenan todos los espacios con el valor 45 de la tabla ascii que corresponde
+    a '-' y se deja lista la sala para empezas a elegir los asientos del usuario.
+
+
+    */
     char cine[15][20] ;
         int asiento=0 , aux_numeros=0 , opcion_2=1;
         char fila=0 , aux=65;
